@@ -15,9 +15,12 @@ SHEET = GSPREAD_CLIENT.open('love_sandwiches')
 
 def get_sales_data():
     """
-    Get sales figures input from the user
+    Get sales figures input from the user.
+    Run a while loop to collect a valid string of data from the user
+    via the terminal, which must be a string of 6 numbers separated 
+    by commas. The loop will repeatedly request data until it is valid.
     """
-    # while loop which ends when the correct data is entered, the returned value in the 
+    # while loop which ends when the correct data is entered, the returned value in the
     # validate_date funtion is used as the condition for the while loop in get_sales_data func
     while True:
         print("Please enter sales data from the last market.")
@@ -26,13 +29,16 @@ def get_sales_data():
 
         data_str = input("Enter your data here: ")
 
-        sales_data = data_str.split(",") #converts the string of data from the user into a list of values
+        # converts the string of data from the user into a list of values
+        sales_data = data_str.split(",")
 
-        if validate_data(sales_data): #single if statemnet to call validate_data func passing it the sales_data list
+        # single if statemnet to call validate_data func passing it the sales_data list
+        if validate_data(sales_data):
             print("Data is valid!")
-            break #breaks when returned true
+            break  # breaks when returned true
 
-    return sales_data
+    return sales_data  # returns the users value input
+
 
 def validate_data(values):
     """
@@ -41,15 +47,29 @@ def validate_data(values):
     or if there aren't exactly 6 values.
     """
     try:
-        [int(value) for value in values] #converting each value to int
-        if len(values) != 6: #checking if values list has exactly 6 values
+        # converting each value to int using list comprehension
+        [int(value) for value in values]
+        if len(values) != 6:  # checking if values list has exactly 6 values
             raise ValueError(
                 f"Exactly 6 values required, you provided {len(values)}"
             )
     except ValueError as e:
         print(f"Invalid data: {e}, please try again.\n")
-        return False #false if there are errors, the while loop above repeasts until true
+        return False  # false if there are errors, the while loop above repeats until true
 
-    return True #true is returned if there are no errors
+    return True  # true is returned if there are no errors
+
+
+def update_sales_worksheet(data):
+    """
+    Update sales worksheet, add new row with the list data provided.
+    """
+    print("Updating sales worksheet...\n")
+    sales_worksheet = SHEET.worksheet("sales")
+    sales_worksheet.append_row(data)
+    print("Sales worksheet updated sucessfully.\n")
+
 
 data = get_sales_data()
+sales_data = [int(num) for num in data]
+update_sales_worksheet(sales_data)
